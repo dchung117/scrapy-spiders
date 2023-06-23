@@ -7,20 +7,22 @@
 # useful for handling different item types with a single interface
 from itemadapter import ItemAdapter
 
-from items import BookscraperItem
-from spiders.bookspider import BookspiderSpider
+from .items import BookscraperItem
+from .spiders.bookspider import BookspiderSpider
 class BookscraperPipeline:
     def process_item(self, item: BookscraperItem, spider: BookspiderSpider):
         adapter = ItemAdapter(item)
 
         # strip extra whicespace
         for field in adapter.field_names():
-            if field != "description":
+            if field not in ["description", "stars"]:
                 value = adapter.get(field)
+                if type(value) == tuple:
+                    value = value[0]
                 adapter[field] = value.strip()
 
         # lowercase
-        lowercase_fields =  ["category", "product_type"]
+        lowercase_fields = ["category", "product_type"]
         for field in lowercase_fields:
             value = adapter.get(field)
             adapter[field] = value.lower()

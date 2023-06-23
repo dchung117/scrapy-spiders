@@ -1,7 +1,7 @@
 import scrapy
 from scrapy.http import Response
 
-from items import BookscraperItem
+from ..items import BookscraperItem
 
 STAR_RATINGS = {
     "One" : 1,
@@ -65,12 +65,13 @@ class BookspiderSpider(scrapy.Spider):
 
         book_item["url"] = response.url,
         book_item["title"] = response.css(".product_main h1::text").get()
+        book_item["upc"] = table_rows[0].css("td::text").get()
         book_item["product_type"] = table_rows[1].css("td::text").get()
         book_item["price_excl_tax"] = table_rows[2].css("td::text").get()
         book_item["price_incl_tax"] = table_rows[3].css("td::text").get()
         book_item["tax"] = table_rows[4].css("td::text").get()
         book_item["availability"] = table_rows[5].css("td::text").get()
-        book_item["num_reviews"] = table_rows[5].css("td::text").get()
+        book_item["num_reviews"] = table_rows[6].css("td::text").get()
         book_item["stars"] = STAR_RATINGS[
             response.css(".star-rating").attrib["class"].split(" ")[-1]
         ]

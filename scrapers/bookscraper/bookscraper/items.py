@@ -17,6 +17,9 @@ def serialize_price(value: str) -> str:
     return f"£ {value}"
 
 class BookscraperItem(scrapy.Item):
+    """
+    Scraped book information
+    """
     url = scrapy.Field()
     title = scrapy.Field()
     upc = scrapy.Field()

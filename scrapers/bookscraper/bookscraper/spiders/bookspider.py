@@ -24,7 +24,6 @@ class BookspiderSpider(scrapy.Spider):
         "FEEDS": {
             "books.csv": {"format": "csv", "overwrite": True}
         }
-        
     }
     def parse(self, response: Response) -> dict[str, str]:
         """

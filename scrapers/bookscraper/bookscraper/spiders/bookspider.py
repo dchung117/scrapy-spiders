@@ -19,6 +19,13 @@ class BookspiderSpider(scrapy.Spider):
     allowed_domains = ["books.toscrape.com"]
     start_urls = ["http://books.toscrape.com/"]
 
+    # override global settings
+    custom_settings = {
+        "FEEDS": {
+            "books.csv": {"format": "csv"}
+        }
+        
+    }
     def parse(self, response: Response) -> dict[str, str]:
         """
         Top-level parse function to extract data from each book ion page.

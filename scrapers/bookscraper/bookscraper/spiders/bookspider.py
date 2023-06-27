@@ -22,7 +22,7 @@ class BookspiderSpider(scrapy.Spider):
     # override global settings
     custom_settings = {
         "FEEDS": {
-            "books.csv": {"format": "csv"}
+            "books.csv": {"format": "csv", "overwrite": True}
         }
         
     }

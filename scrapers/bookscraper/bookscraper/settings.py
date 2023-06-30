@@ -16,6 +16,7 @@ FEEDS = {
     "books.json": {"format": "json"}
 }
 
+API_KEY = "4a3d1175-4044-43e1-b497-39abb7c03b44"
 FAKE_USER_AGENT_ENDPOINT = "https://headers.scrapeops.io/v1/user-agents"
 FAKE_USER_AGENT_ENABLED = True
 NUM_RESULTS = 50
@@ -58,7 +59,7 @@ ROBOTSTXT_OBEY = True
 # See https://docs.scrapy.org/en/latest/topics/downloader-middleware.html
 DOWNLOADER_MIDDLEWARES = {
 #    "bookscraper.middlewares.BookscraperDownloaderMiddleware": 543,
-   "bookscraper.middlewares.SCrapeOpsFakeUserAgentMiddleWare": 400,
+   "bookscraper.middlewares.ScrapeOpsFakeUserAgentMiddleware": 400,
 }
 
 # Enable or disable extensions

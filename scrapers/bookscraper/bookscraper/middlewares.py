@@ -3,15 +3,11 @@
 # See documentation in:
 # https://docs.scrapy.org/en/latest/topics/spider-middleware.html
 
-import os
 from collections.abc import Mapping
 from typing import Any
 import random
 from urllib.parse import urlencode
 import requests
-
-from dotenv import load_dotenv
-load_dotenv("..")
 
 import scrapy
 from scrapy import signals
@@ -127,7 +123,7 @@ class ScrapeOpsFakeUserAgentMiddleware:
         return cls(crawler.settings)
 
     def __init__(self, settings: Mapping[str, Any]) -> None:
-        self.api_key = os.environ.get("API_KEY")
+        self.api_key = settings.get("API_KEY")
         self.endpoint = settings.get("FAKE_USER_AGENT_ENDPOINT", "https://headers.scrapeops.io/v1/user-agents")
         self.enabled_fake_user_agents = settings.get("FAKE_USER_AGENT_ENABLED", False)
         self.num_results = settings.get("NUM_RESULTS")
@@ -185,3 +181,6 @@ class ScrapeOpsFakeUserAgentMiddleware:
         # Randomly select user agent
         user_agent = self._get_random_user_agent()
         request.headers["User-Agent"] = user_agent
+
+        print("***NEW HEADER***")
+        print(request.headers["User-Agent"])

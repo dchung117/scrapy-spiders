@@ -169,12 +169,12 @@ class ScrapeOpsFakeUserAgentMiddleware:
         else:
             self.enabled_fake_user_agents = True
 
-    def process_request(self, request: requests.Request, spider: scrapy.Spider) -> None:
+    def process_request(self, request: scrapy.http.headers.Headers, spider: scrapy.Spider) -> None:
         """
         Randomly select user agent add to request header.
 
         :param: request - request object
-        :dtype: requests.Request
+        :dtype: scrapy.http.headers.Headers
         :param: spider - scrapy spider
         :dtype: scrapy.Spider
         :return: None
@@ -183,7 +183,6 @@ class ScrapeOpsFakeUserAgentMiddleware:
         # Randomly select user agent
         user_agent = self._get_random_user_agent()
         request.headers["User-Agent"] = user_agent
-        print(type(request.headers))
 
 class ScrapeOpsFakeBrowserHeaderAgentMiddleware:
     """
@@ -240,12 +239,12 @@ class ScrapeOpsFakeBrowserHeaderAgentMiddleware:
         else:
             self.enabled_fake_browser_headers = True
 
-    def process_request(self, request: requests.Request, spider: scrapy.Spider) -> None:
+    def process_request(self, request: scrapy.http.headers.Headers, spider: scrapy.Spider) -> None:
         """
         Randomly select fake browser header
 
         :param: request - request object
-        :dtype: requests.Request
+        :dtype: scrapy.http.headers.Headers
         :param: spider - scrapy spider
         :dtype: scrapy.Spider
         :return: None
@@ -253,6 +252,3 @@ class ScrapeOpsFakeBrowserHeaderAgentMiddleware:
         """
         random_browser_header = self._get_random_browser_header()
         request = request.replace(headers=random_browser_header)
-
-        print("***NEW HEADER***")
-        print(request.headers)

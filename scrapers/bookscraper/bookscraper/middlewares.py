@@ -3,6 +3,17 @@
 # See documentation in:
 # https://docs.scrapy.org/en/latest/topics/spider-middleware.html
 
+import os
+from collections.abc import Mapping
+from typing import Any
+import random
+from urllib.parse import urlencode
+import requests
+
+from dotenv import load_dotenv
+load_dotenv("..")
+
+import scrapy
 from scrapy import signals
 
 # useful for handling different item types with a single interface
@@ -101,3 +112,26 @@ class BookscraperDownloaderMiddleware:
 
     def spider_opened(self, spider):
         spider.logger.info("Spider opened: %s" % spider.name)
+
+class ScrapeOpsFakeUserAgentMiddleware:
+
+    @classmethod
+    def from_crawler(cls, crawler: scrapy.Spider):
+        """
+        Get settings from crawler
+
+        :param: crawler - scrapy spider object
+        :dtype: scrapy.Spider
+        :return: parsed crawler settings
+        """
+        return cls(crawler.settings)
+
+    def __init__(self, settings: Mapping[str, Any]) -> None:
+        self.api_key = os.environ.get("API_KEY")
+        self.endpoint = settings.get("FAKE_USER_AGENT_ENDPOINT", "https://headers.scrapeops.io/v1/user-agents")
+        self.enabled_fake_user_agents = settings.get("FAKE_USER_AGENT_ENABLED", False)
+        self.num_results = settings.get("NUM_RESULTS")
+
+        self.headers = []
+        self._get_user_agents()
+        self._fake_user_agents_enabled()

@@ -16,6 +16,9 @@ FEEDS = {
     "books.json": {"format": "json"}
 }
 
+FAKE_USER_AGENT_ENDPOINT = "https://headers.scrapeops.io/v1/user-agents"
+FAKE_USER_AGENT_ENABLED = True
+NUM_RESULTS = 50
 # Crawl responsibly by identifying yourself (and your website) on the user-agent
 #USER_AGENT = "bookscraper (+http://www.yourdomain.com)"
 

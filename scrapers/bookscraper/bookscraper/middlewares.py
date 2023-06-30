@@ -110,7 +110,9 @@ class BookscraperDownloaderMiddleware:
         spider.logger.info("Spider opened: %s" % spider.name)
 
 class ScrapeOpsFakeUserAgentMiddleware:
-
+    """
+    Middleware that randomly selects user agent and modifies request.
+    """
     @classmethod
     def from_crawler(cls, crawler: scrapy.Spider):
         """
@@ -182,5 +184,74 @@ class ScrapeOpsFakeUserAgentMiddleware:
         user_agent = self._get_random_user_agent()
         request.headers["User-Agent"] = user_agent
 
+class ScrapeOpsFakeBrowserHeaderAgentMiddleware:
+    """
+    Middleware that generates fake browser header before request is sent.
+    """
+    @classmethod
+    def from_crawler(cls, crawler):
+        """
+        Get settings from crawler
+
+        :param: crawler - scrapy spider object
+        :dtype: scrapy.Spider
+        :return: parsed crawler settings
+        """
+        return cls(crawler.settings)
+
+    def __init__(self, settings: Mapping[str, Any]) -> None:
+        self.api_key = settings.get('API_KEY')
+        self.endpoint = settings.get('FAKE_BROWSER_HEADER_ENDPOINT', 'http://headers.scrapeops.io/v1/browser-headers')
+        self.enabled_fake_browser_headers= settings.get('FAKE_BROWSER_HEADER_ENABLED', False)
+        self.num_results = settings.get('NUM_RESULTS')
+        self.headers = []
+        self._get_headers()
+        self._fake_browser_headers_enabled()
+
+    def _get_headers(self):
+        """
+        Get headers from ScrapeOps
+        """
+        payload = {"api_key": self.api_key}
+        if self.num_results is not None:
+            payload["num_results"] = self.num_results
+        response = requests.get(self.endpoint, params=urlencode(payload)).json()
+        self.headers = response.get("result", [])
+
+    def _get_random_browser_header(self) -> dict[str, Any]:
+        """
+        Randomly select browser header.
+
+        :return: fake header
+        :rtype: dict[str, Any]
+        """
+        return self.headers[random.randint(0, len(self.headers) - 1)]
+
+    def _fake_browser_headers_enabled(self):
+        """
+        Toggle setting to use fake browser headers
+
+        :return: None
+        :rtype: None
+        """
+        if self.api_key is None or self.api_key == '' or not self.enabled_fake_browser_headers:
+            self.enabled_fake_browser_headers = False
+        else:
+            self.enabled_fake_browser_headers = True
+
+    def process_request(self, request: requests.Request, spider: scrapy.Spider) -> None:
+        """
+        Randomly select fake browser header
+
+        :param: request - request object
+        :dtype: requests.Request
+        :param: spider - scrapy spider
+        :dtype: scrapy.Spider
+        :return: None
+        :rtype: None
+        """
+        random_browser_header = self._get_random_browser_header()
+        request.headers = random_browser_header
+
         print("***NEW HEADER***")
-        print(request.headers["User-Agent"])
+        print(request.headers)

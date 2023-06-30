@@ -135,3 +135,53 @@ class ScrapeOpsFakeUserAgentMiddleware:
         self.headers = []
         self._get_user_agents()
         self._fake_user_agents_enabled()
+
+    def _get_user_agents(self) -> None:
+        """
+        Retrieve list of user agents from ScrapeOps
+
+        :return: None
+        :rtype: None
+        """
+        payload = {"api_key": self.api_key}
+        if self.num_results is not None:
+            payload["num_results"] = self.num_results
+
+        response = requests.get(self.endpoint, params=urlencode(payload)).json()
+        self.user_agents = [response.get("result", [])]
+
+    def _get_random_user_agent(self) -> str:
+        """
+        Get random user agent from list
+
+        :return: user-agent string
+        :rtype: str
+        """
+        return self.user_agents[random.randint(0, len(self.user_agents)-1)]
+
+    def _fake_user_agents_enabled(self) -> None:
+        """
+        Toggle flag to set user agents as active or not
+
+        :return: None
+        :rtype: None
+        """
+        if self.api_key is None or self.api_key == "" or not self.enabled_fake_user_agents:
+            self.enabled_fake_user_agents = False
+        else:
+            self.enabled_fake_user_agents = True
+
+    def process_request(self, request: requests.Request, spider: scrapy.Spider) -> None:
+        """
+        Randomly select user agent add to request header.
+
+        :param: request - request object
+        :dtype: requests.Request
+        :param: spider - scrapy spider
+        :dtype: scrapy.Spider
+        :return: None
+        :rtype: None
+        """
+        # Randomly select user agent
+        user_agent = self._get_random_user_agent()
+        request.headers["User-Agent"] = user_agent

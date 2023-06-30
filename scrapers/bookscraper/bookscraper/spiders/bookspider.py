@@ -1,3 +1,4 @@
+import random
 import scrapy
 from scrapy.http import Response
 
@@ -25,6 +26,16 @@ class BookspiderSpider(scrapy.Spider):
             "books.csv": {"format": "csv", "overwrite": True}
         }
     }
+
+    # user agent list
+    user_agents = [
+        'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/93.0.4577.82 Safari/537.36',
+        'Mozilla/5.0 (iPhone; CPU iPhone OS 14_4_2 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/14.0.3 Mobile/15E148 Safari/604.1',
+        'Mozilla/4.0 (compatible; MSIE 9.0; Windows NT 6.1)',
+        'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.141 Safari/537.36 Edg/87.0.664.75',
+        'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.102 Safari/537.36 Edge/18.18363',
+        ]
+
     def parse(self, response: Response) -> dict[str, str]:
         """
         Top-level parse function to extract data from each book ion page.
@@ -45,7 +56,10 @@ class BookspiderSpider(scrapy.Spider):
             if not book_relative_url.startswith("catalogue/"):
                 book_relative_url = "catalogue/" + book_relative_url
             full_book_url = "https://books.toscrape.com/" + book_relative_url
-            yield response.follow(full_book_url, callback=self.parse_full_book_page)
+
+            # randomly select user agent
+            yield response.follow(full_book_url, callback=self.parse_full_book_page,
+                headers={"User-Agent": self.user_agents[random.randint(0, len(self.user_agents) - 1)]})
 
         # scroll to next page
         next_page = response.css("li.next a::attr(href)").get()
@@ -53,7 +67,8 @@ class BookspiderSpider(scrapy.Spider):
             if not next_page.startswith("catalogue"):
                 next_page = "catalogue/" + next_page
             next_page_url = "https://books.toscrape.com/" + next_page
-            yield response.follow(next_page_url, callback=self.parse)
+            yield response.follow(next_page_url, callback=self.parse,
+                headers={"User-Agent": self.user_agents[random.randint(0, len(self.user_agents) - 1)]})
 
     def parse_full_book_page(self, response: Response) -> dict[str, str]:
         """

@@ -183,6 +183,7 @@ class ScrapeOpsFakeUserAgentMiddleware:
         # Randomly select user agent
         user_agent = self._get_random_user_agent()
         request.headers["User-Agent"] = user_agent
+        print(type(request.headers))
 
 class ScrapeOpsFakeBrowserHeaderAgentMiddleware:
     """
@@ -251,7 +252,7 @@ class ScrapeOpsFakeBrowserHeaderAgentMiddleware:
         :rtype: None
         """
         random_browser_header = self._get_random_browser_header()
-        request.headers = random_browser_header
+        request = request.replace(headers=random_browser_header)
 
         print("***NEW HEADER***")
         print(request.headers)

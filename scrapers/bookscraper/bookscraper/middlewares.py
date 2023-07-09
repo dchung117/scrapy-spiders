@@ -8,6 +8,7 @@ from typing import Any
 import random
 from urllib.parse import urlencode
 import requests
+import base64
 
 import scrapy
 from scrapy import signals
@@ -189,7 +190,7 @@ class ScrapeOpsFakeBrowserHeaderAgentMiddleware:
     Middleware that generates fake browser header before request is sent.
     """
     @classmethod
-    def from_crawler(cls, crawler):
+    def from_crawler(cls, crawler: scrapy.Spider):
         """
         Get settings from crawler
 
@@ -244,7 +245,7 @@ class ScrapeOpsFakeBrowserHeaderAgentMiddleware:
         Randomly select fake browser header
 
         :param: request - request object
-        :dtype: scrapy.http.headers.Headers
+        :dtype: scrapy.http.headers.Header
         :param: spider - scrapy spider
         :dtype: scrapy.Spider
         :return: None
@@ -252,3 +253,41 @@ class ScrapeOpsFakeBrowserHeaderAgentMiddleware:
         """
         random_browser_header = self._get_random_browser_header()
         request = request.replace(headers=random_browser_header)
+
+class MyProxyMiddleware(object):
+    """
+    Middleware for updating proxy.
+    """
+    @classmethod
+    def from_crawler(cls, crawler: scrapy.Spider):
+        """
+        Get settings from crawler
+
+        :param: crawler - scrapy spider object
+        :dtype: scrapy.Spider
+        :return: parsed crawler settings
+        """
+        return cls(crawler.settings)
+
+    def __init__(self, settings: Mapping[str, Any]):
+        self.user = settings.get("PROXY_USER")
+        self.password = settings.get("PROXY_PASSWORD")
+        self.endpoint = settings.get("PROXY_ENDPOINT")
+        self.port = settings.get("PROXY_PORT")
+
+    def process_request(self, request: scrapy.http.headers.Headers, spider: scrapy.Spider):
+        """
+        Sets up proxy and proxy authorization in the request header.
+
+        :param: request - request object
+        :dtype: scrapy.http.headers.Headers
+        :param: spider - scrapy spider
+        :dtype: scrapy.Spider
+        :return: None
+        :rtype: None
+        """
+        user_credentials = f"{self.user}:{self.password}"
+        basic_authentication = "Basic " + base64.b64encode(user_credentials.encode()).decode()
+        host = f"http://{self.endpoint}:{self.port}"
+        request.meta["proxy"] = host
+        request.headers['Proxy-Authorization'] = basic_authentication

@@ -2,7 +2,7 @@ from urllib.parse import urlencode
 import scrapy
 from scrapy.http import Response
 
-from ..settings import API_KEY
+from ..settings import SCRAPEOPS_API_KEY
 from ..items import BookscraperItem
 
 STAR_RATINGS = {
@@ -22,7 +22,7 @@ def get_scrapeops_proxy_url(url: str) -> str:
     :return: ScrapeOps proxy URL
     :rtype: str
     """
-    payload = {"api_key": API_KEY, "url": url}
+    payload = {"api_key": SCRAPEOPS_API_KEY, "url": url}
     proxy_url = f"https://proxy.scrapeops.io/v1/?{urlencode(payload)}"
     return proxy_url
 class BookspiderSpider(scrapy.Spider):

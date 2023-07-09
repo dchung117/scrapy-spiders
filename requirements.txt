@@ -59,6 +59,7 @@ queuelib==1.6.2
 requests==2.31.0
 requests-file==1.5.1
 Scrapy==2.9.0
+scrapy-rotating-proxies==0.6.2
 service-identity==23.1.0
 six==1.16.0
 smart-open==6.3.0
@@ -73,6 +74,7 @@ tqdm==4.65.0
 traitlets==5.9.0
 Twisted==22.10.0
 typer==0.7.0
+typing==3.7.4.3
 typing_extensions==4.6.3
 urllib3==2.0.3
 w3lib==2.1.1

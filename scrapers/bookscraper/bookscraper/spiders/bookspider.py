@@ -47,7 +47,7 @@ class BookspiderSpider(scrapy.Spider):
         :return: first Scrapy request
         :rtype: scrapy.Request
         """
-        yield scrapy.Request(url=get_scrapeops_proxy_url(self.start_urls[0]), callback=self.parse)
+        yield scrapy.Request(url=self.start_urls[0], callback=self.parse)
 
     def parse(self, response: Response) -> scrapy.Request:
         """

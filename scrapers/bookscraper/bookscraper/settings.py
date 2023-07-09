@@ -23,6 +23,12 @@ NUM_RESULTS = 50
 
 FAKE_BROWSER_HEADER_ENDPOINT = "http://headers.scrapeops.io/v1/browser-headers"
 FAKE_BROWSER_HEADER_ENABLED = True
+
+ROTATING_PROXY_LIST = [
+    "143.198.237.236:9050",
+    "162.255.108.5:5678",
+    "50.250.56.129:48380"
+]
 # Crawl responsibly by identifying yourself (and your website) on the user-agent
 #USER_AGENT = "bookscraper (+http://www.yourdomain.com)"
 

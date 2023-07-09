@@ -79,7 +79,7 @@ DOWNLOADER_MIDDLEWARES = {
    "bookscraper.middlewares.ScrapeOpsFakeBrowserHeaderAgentMiddleware": 400,
 #    "rotating_proxies.middlewares.RotatingProxyMiddleware": 610,
 #    "rotating_proxies.middlewares.BanDetectionMiddleware": 620,
-   "bookscraper.middlewares.MyProxyMiddleware": 350
+#    "bookscraper.middlewares.MyProxyMiddleware": 350
 }
 
 # Enable or disable extensions

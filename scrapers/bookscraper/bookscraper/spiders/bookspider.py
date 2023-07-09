@@ -1,6 +1,8 @@
+from urllib.parse import urlencode
 import scrapy
 from scrapy.http import Response
 
+from ..settings import API_KEY
 from ..items import BookscraperItem
 
 STAR_RATINGS = {
@@ -11,12 +13,24 @@ STAR_RATINGS = {
     "Five": 5
 }
 
+def get_scrapeops_proxy_url(url: str) -> str:
+    """
+    Creates proxy URL for ScrapeOps.
+
+    :param: url - input URL
+    :dtype: str
+    :return: ScrapeOps proxy URL
+    :rtype: str
+    """
+    payload = {"api_key": API_KEY, "url": url}
+    proxy_url = f"https://proxy.scrapeops.io/v1/?{urlencode(payload)}"
+    return proxy_url
 class BookspiderSpider(scrapy.Spider):
     """
     Simple web spider to scrapy book data.
     """
     name = "bookspider"
-    allowed_domains = ["books.toscrape.com"]
+    allowed_domains = ["books.toscrape.com", "proxy.scrapeops.io"]
     start_urls = ["http://books.toscrape.com/"]
 
     # override global settings
@@ -26,14 +40,23 @@ class BookspiderSpider(scrapy.Spider):
         }
     }
 
-    def parse(self, response: Response) -> dict[str, str]:
+    def start_requests(self) -> scrapy.Request:
+        """
+        Initial function to begin sending requests.
+
+        :return: first Scrapy request
+        :rtype: scrapy.Request
+        """
+        yield scrapy.Request(url=get_scrapeops_proxy_url(self.start_urls[0]), callback=self.parse)
+
+    def parse(self, response: Response) -> scrapy.Request:
         """
         Top-level parse function to extract data from each book ion page.
 
         :param: response - HTTP response object of book page.
         :dtype: Response
         :return - scraped book data
-        :rtype: dict[str, str,]
+        :rtype: scrapy.Request
         """
         # get all books from page
         books = response.css("article.product_pod")
@@ -48,7 +71,7 @@ class BookspiderSpider(scrapy.Spider):
             full_book_url = "https://books.toscrape.com/" + book_relative_url
 
             # randomly select user agent
-            yield response.follow(full_book_url, callback=self.parse_full_book_page)
+            yield scrapy.Request(url=get_scrapeops_proxy_url(full_book_url), callback=self.parse_full_book_page)
 
         # scroll to next page
         next_page = response.css("li.next a::attr(href)").get()
@@ -56,7 +79,7 @@ class BookspiderSpider(scrapy.Spider):
             if not next_page.startswith("catalogue"):
                 next_page = "catalogue/" + next_page
             next_page_url = "https://books.toscrape.com/" + next_page
-            yield response.follow(next_page_url, callback=self.parse)
+            yield scrapy.Request(url=get_scrapeops_proxy_url(next_page_url), callback=self.parse)
 
     def parse_full_book_page(self, response: Response) -> dict[str, str]:
         """

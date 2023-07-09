@@ -71,7 +71,7 @@ class BookspiderSpider(scrapy.Spider):
             full_book_url = "https://books.toscrape.com/" + book_relative_url
 
             # randomly select user agent
-            yield scrapy.Request(url=get_scrapeops_proxy_url(full_book_url), callback=self.parse_full_book_page)
+            yield scrapy.Request(url=full_book_url, callback=self.parse_full_book_page)
 
         # scroll to next page
         next_page = response.css("li.next a::attr(href)").get()
@@ -79,7 +79,7 @@ class BookspiderSpider(scrapy.Spider):
             if not next_page.startswith("catalogue"):
                 next_page = "catalogue/" + next_page
             next_page_url = "https://books.toscrape.com/" + next_page
-            yield scrapy.Request(url=get_scrapeops_proxy_url(next_page_url), callback=self.parse)
+            yield scrapy.Request(url=next_page_url, callback=self.parse)
 
     def parse_full_book_page(self, response: Response) -> dict[str, str]:
         """
